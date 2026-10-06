@@ -129,3 +129,20 @@ print_text_report() {
     ' "$LOG_FILE"
     echo
 }
+
+# Print the report as CSV: one row per test
+print_csv_report() {
+    awk '
+    BEGIN { print "test,status,time" }          # header row, printed once
+    /TEST (PASS|FAIL|SKIP):/ {
+        s = $4
+        gsub(/:/, "", s)                         # "PASS:" -> "PASS"
+        t = ""                                   # SKIP rows keep an empty time
+        if (s == "PASS" || s == "FAIL") {
+            t = $6
+            gsub(/[()s]/, "", t)                 # "(0.82s)" -> "0.82"
+        }
+        print $5 "," s "," t
+    }
+    ' "$LOG_FILE"
+}
