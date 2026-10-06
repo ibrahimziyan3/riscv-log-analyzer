@@ -73,3 +73,22 @@ if [[ ! -f "$LOG_FILE" ]]; then
     echo "Error: file not found: $LOG_FILE" >&2
     exit 1
 fi
+
+# Count lines in the log that report a given test status (PASS, FAIL or SKIP)
+count_status() {
+    local status="$1"
+    grep -c "TEST ${status}:" "$LOG_FILE" || true
+}
+
+PASS=$(count_status "PASS")
+FAIL=$(count_status "FAIL")
+SKIP=$(count_status "SKIP")
+
+TOTAL=$((PASS + FAIL + SKIP))
+if [[ "$TOTAL" -eq 0 ]]; then
+    echo "Error: no test results found in $LOG_FILE" >&2
+    exit 1
+fi
+PASS_RATE=$(awk -v p="$PASS" -v t="$TOTAL" 'BEGIN { printf "%.1f", p / t * 100 }')
+FAIL_RATE=$(awk -v p="$FAIL" -v t="$TOTAL" 'BEGIN { printf "%.1f", p / t * 100 }')
+SKIP_RATE=$(awk -v p="$SKIP" -v t="$TOTAL" 'BEGIN { printf "%.1f", p / t * 100 }')
