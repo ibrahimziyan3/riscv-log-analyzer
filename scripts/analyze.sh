@@ -92,3 +92,40 @@ fi
 PASS_RATE=$(awk -v p="$PASS" -v t="$TOTAL" 'BEGIN { printf "%.1f", p / t * 100 }')
 FAIL_RATE=$(awk -v p="$FAIL" -v t="$TOTAL" 'BEGIN { printf "%.1f", p / t * 100 }')
 SKIP_RATE=$(awk -v p="$SKIP" -v t="$TOTAL" 'BEGIN { printf "%.1f", p / t * 100 }')
+
+#Function for Default or Text output
+print_text_report() {
+    echo "=== RISC-V Simulation Log Analysis ==="
+    echo "Log file: $LOG_FILE"
+    echo "Analysis date: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo
+    echo "--- Results Summary ---"
+    echo "Total tests: $TOTAL"
+    echo "Passed:  $PASS ($PASS_RATE%)"
+    echo "Failed:  $FAIL ($FAIL_RATE%)"
+    echo "Skipped: $SKIP ($SKIP_RATE%)"
+    echo
+    echo "--- Failed Tests ---"
+    awk '/TEST FAIL:/ { n++; print n ". " $5 }' "$LOG_FILE"
+    echo
+    echo "--- Timing Statistics ---"
+    awk '
+    /TEST (PASS|FAIL):/ {
+        t = $6
+        gsub(/[()s]/, "", t)
+        t = t + 0
+        sum += t
+        n++
+        if (n == 1 || t < min) { min = t; min_name = $5 }
+        if (n == 1 || t > max) { max = t; max_name = $5 }
+    }
+    END {
+        if (n > 0) {
+            printf "Min time: %.2fs (%s)\n", min, min_name
+            printf "Max time: %.2fs (%s)\n", max, max_name
+            printf "Avg time: %.2fs\n", sum / n
+        }
+    }
+    ' "$LOG_FILE"
+    echo
+}
