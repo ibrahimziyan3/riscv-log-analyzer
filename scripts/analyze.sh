@@ -170,6 +170,7 @@ else
     fi
 fi
 
+
 #Verbose Details 
 if [[ "$VERBOSE" == true ]]; then
     echo
