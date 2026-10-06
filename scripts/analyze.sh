@@ -60,3 +60,16 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Check 1: a log file argument must be given
+if [[ -z "$LOG_FILE" ]]; then
+    echo "Error: no log file given" >&2
+    usage
+    exit 1
+fi
+
+# Check 2: the file must actually exist
+if [[ ! -f "$LOG_FILE" ]]; then
+    echo "Error: file not found: $LOG_FILE" >&2
+    exit 1
+fi
