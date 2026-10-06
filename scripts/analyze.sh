@@ -169,3 +169,25 @@ else
         print_text_report
     fi
 fi
+
+#Verbose Details 
+if [[ "$VERBOSE" == true ]]; then
+    echo
+    echo "--- Error Details ---"
+    grep "ERROR:" "$LOG_FILE" || echo "(no error lines)"
+fi
+# echo "--- Verdict: ---"
+
+if [[ "$FAIL" -gt 0 ]]; then
+    if [[ "$FORMAT" == "text" ]]; then
+        echo "--- Verdict: FAIL ---"
+        echo "Exit code: 1"
+    fi
+    exit 1
+else
+    if [[ "$FORMAT" == "text" ]]; then
+        echo "--- Verdict: PASS ---"
+        echo "Exit code: 0"
+    fi
+    exit 0
+fi
