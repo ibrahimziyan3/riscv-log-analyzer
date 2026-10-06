@@ -146,3 +146,26 @@ print_csv_report() {
     }
     ' "$LOG_FILE"
 }
+
+#Avoiding wrong format errors
+if [[ "$FORMAT" != "text" && "$FORMAT" != "csv" ]]; then
+    echo "Error: format must be text or csv" >&2
+    exit 1
+fi
+
+# output details
+if [[ -n "$OUTPUT" ]]; then
+    mkdir -p "$(dirname "$OUTPUT")"
+    if [[ "$FORMAT" == "csv" ]]; then
+        print_csv_report > "$OUTPUT"
+    else
+        print_text_report > "$OUTPUT"
+    fi
+    echo "Report written to $OUTPUT"
+else
+    if [[ "$FORMAT" == "csv" ]]; then
+        print_csv_report
+    else
+        print_text_report
+    fi
+fi
